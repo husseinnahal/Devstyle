@@ -3,13 +3,15 @@ const yourRole=(role)=>{
 
     return  (req,res,next)=>{
         // req.decoded.role what we use a value from decoded in verfyToken 
-        if (!role.includes(req.decoded.role)) {
+        console.log(role);
+        console.log(req.decoded);
+        
+        if (role!=req.decoded.role) {
             
           return  res.status(401).json({
                 status:false,
                 message:"you are not admin",
             });
-
         }
         next();
     }

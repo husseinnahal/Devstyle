@@ -77,6 +77,12 @@ const getItemsByCat=async (req,res)=>{
         if (subcategory) filter.Subcat = subcategory;
         if (minPrice) filter.price = { $gte: Number(minPrice) }; // Greater than or equal to minPrice
         if (maxPrice) filter.price = { ...filter.price, $lte: Number(maxPrice) }; // Less than or equal to maxPrice
+        // pagination
+        const limit=req.query.limit || 16;
+        const page=req.query.page || 1;
+        const skip=(page-1)*limit;
+        
+        // for filters New item and most popular
         let getitems={}
         if (sortNew && populars) {
             const bysold = parseInt(populars); // -1 or 1
@@ -85,7 +91,7 @@ const getItemsByCat=async (req,res)=>{
                 sold: bysold,
                 createdAt: bytime,
               };
-            getitems = await Items.find(filter, { "__v": false }).sort(sort);
+            getitems = await Items.find(filter, { "__v": false }).sort(sort).limit(limit).skip(skip);
             
         }
         else if (sortNew){
@@ -97,7 +103,7 @@ const getItemsByCat=async (req,res)=>{
                 newcreatedAt="-createdAt";
             }
             
-             getitems = await Items.find(filter, { "__v": false }).sort(newcreatedAt);
+             getitems = await Items.find(filter, { "__v": false }).sort(newcreatedAt).limit(limit).skip(skip);
         }
         else if (populars){
             // -createdAt for new or createdAt for old to new
@@ -107,12 +113,13 @@ const getItemsByCat=async (req,res)=>{
             } else {
                 popular="-sold";
             }
-             getitems = await Items.find(filter, { "__v": false }).sort(popular);
+             getitems = await Items.find(filter, { "__v": false }).sort(popular).limit(limit).skip(skip);
         }
         else{
-             getitems = await Items.find(filter, { "__v": false });
+             getitems = await Items.find(filter, { "__v": false }).limit(limit).skip(skip);
 
         }
+
         
         // Fetch items based on filters
         if (getitems.length==0) {

@@ -39,11 +39,6 @@ const loginValidation=[
 
 ];
 
-const updateAdress=[
-    body("adress","adress is required").notEmpty(),
-    body("adress","adress must be more than 10 char").isLength({min:10}),
-]
-
 
 const SubCat_Validation=[
     body('name')
@@ -97,6 +92,18 @@ body('inStock')
 
 ]
 
+const OrderValidation=[
+    body('name')
+    .notEmpty().withMessage('Name is required')
+    .isLength({min:3}).withMessage("name must be at least 3 char"),
+    body('addres')
+    .notEmpty().withMessage('addres is required')
+    .isLength({min:10}).withMessage('addres must be more than 10 char'),
+    body('phone')
+    .notEmpty().withMessage('phone is required')
+    .isLength({min:8}).withMessage('phone must be at least 3 char'),
+
+]
 
 const validationMiddleware = (req, res, next) => {
     // if we dont have an error return next
@@ -123,7 +130,7 @@ module.exports={
     validationMiddleware,
     registrValidation,
     loginValidation,
-    updateAdress,
     SubCat_Validation,
-    Items_validation
+    Items_validation,
+    OrderValidation
 }

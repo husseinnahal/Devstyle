@@ -4,10 +4,15 @@ const Carts = require('../Models/CartModel');
 
 const createOrder = async (req, res) => {
     try {
-        const { cartid } = req.body;
+        const { cartid,name,addres,phone } = req.body;
             
         const cart = await Carts.findById(cartid);
-        
+        if(cart.length < 1 || !cart) {
+            return res.status(400).json({
+                status:false,
+                massege:"this cart is empty"
+            })
+        }
         // Loop through the items in the cart and update their sold quantity
         for (let item of cart.items) {
             const product = await Items.findById(item.item);
@@ -30,7 +35,7 @@ const createOrder = async (req, res) => {
         // Create a new order
         const newOrder = new Order({
             user: req.decoded.id,  // Assuming user ID is decoded from a token
-            cartid
+            cartid,name,addres,phone
         });
 
         await newOrder.save();

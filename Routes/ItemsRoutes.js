@@ -16,7 +16,7 @@ Router.get("/:id",Items.getAnItem);
 
 
 
-Router.post("/",token,images('images/Itemimg').array('images', 50),
+Router.post("/",token,role("admin"),images('images/Itemimg').array('images', 50),
 Items_validation,validationMiddleware,Items.addItem);
 
 Router.put("/:id",token,role("admin"),images('images/Itemimg').array('images', 50),

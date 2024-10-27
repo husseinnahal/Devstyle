@@ -24,7 +24,7 @@ const registration= async (req,res)=>{
 
             const adduser=await new User({name,phone,adress,email,password:hashpassword});
 
-            const token = await jwt.sign({email:adduser.email,id:adduser._id},process.env.secret ,{expiresIn: '3d'});
+            const token = await jwt.sign({email:adduser.email,id:adduser._id,role:adduser.role},process.env.secret ,{expiresIn: '3d'});
 
             adduser.token=token;
             adduser.save();
@@ -59,7 +59,8 @@ const login =async(req,res)=>{
                 message:"password is wrong"
             })
         }
-        const token = await jwt.sign({email:userfound.email,id:userfound._id},process.env.secret ,{expiresIn: '1d'});
+        
+        const token = await jwt.sign({email:userfound.email,id:userfound._id,role:userfound.role},process.env.secret ,{expiresIn: '1d'});
         userfound.token=token;
 
         return res.status(200).json({
@@ -76,23 +77,6 @@ const login =async(req,res)=>{
         })
     }
 
-
-}
-
-const UpdateaAdress=async(req,res)=>{
-    try {
-        const {adress}=req.body
-        const update=await User.findByIdAndUpdate(req.params.id,{adress});
-        return res.status(200).json({
-            status:true,
-            message:"Update adress is succesfully"
-        })
-    } catch (error) {
-        return res.status(500).json({
-            status:"error",
-            message:error.message
-        })
-    }
 
 }
 
@@ -124,5 +108,5 @@ module.exports={
     registration,
     getUsers,
     login,
-    UpdateaAdress
+
 }
