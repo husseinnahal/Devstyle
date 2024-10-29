@@ -67,86 +67,57 @@ const getAnItem=async (req,res)=>{
     }
 }
 
-const getItemsByCat=async (req,res)=>{ 
+const getItemsByCat = async (req, res) => { 
     try {
-        const { subcategory, minPrice, maxPrice,sortNew,populars } = req.query;
+        const { subcategory, minPrice, maxPrice, sortNew, populars, limit = 16, page = 1 } = req.query;
 
         // Build filter object
         const filter = { category: req.params.cat };
-
         if (subcategory) filter.Subcat = subcategory;
-        if (minPrice) filter.price = { $gte: Number(minPrice) }; // Greater than or equal to minPrice
-        if (maxPrice) filter.price = { ...filter.price, $lte: Number(maxPrice) }; // Less than or equal to maxPrice
-        // pagination
-        const limit=req.query.limit || 16;
-        const page=req.query.page || 1;
-        const skip=(page-1)*limit;
-        
-        // for filters New item and most popular
-        let getitems={}
-        if (sortNew && populars) {
-            const bysold = parseInt(populars); // -1 or 1
-            const bytime = parseInt(sortNew); 
-            let sort = {
-                sold: bysold,
-                createdAt: bytime,
-              };
-            getitems = await Items.find(filter, { "__v": false }).sort(sort).limit(limit).skip(skip);
-            
-        }
-        else if (sortNew){
-            // -createdAt for new or createdAt for old to new
-            let newcreatedAt = 1;
-            if (sortNew ==1) {
-                newcreatedAt="createdAt";
-            } else {
-                newcreatedAt="-createdAt";
-            }
-            
-             getitems = await Items.find(filter, { "__v": false }).sort(newcreatedAt).limit(limit).skip(skip);
-        }
-        else if (populars){
-            // -createdAt for new or createdAt for old to new
-            let popular = 1;
-            if (populars ==1) {
-                popular="sold";
-            } else {
-                popular="-sold";
-            }
-             getitems = await Items.find(filter, { "__v": false }).sort(popular).limit(limit).skip(skip);
-        }
-        else{
-             getitems = await Items.find(filter, { "__v": false }).limit(limit).skip(skip);
+        if (minPrice) filter.price = { $gte: Number(minPrice) };
+        if (maxPrice) filter.price = { ...filter.price, $lte: Number(maxPrice) };
 
-        }
+        // Pagination settings
+        const limitInt = parseInt(limit);
+        const skip = (parseInt(page) - 1) * limitInt;
 
-        
-        // Fetch items based on filters
-        if (getitems.length==0) {
+        // Build sort criteria based on query parameters
+        const sortCriteria = {};
+        if (sortNew) sortCriteria.createdAt = sortNew === '1' ? 1 : -1;
+        if (populars) sortCriteria.sold = populars === '1' ? 1 : -1;
+
+        // Fetch items based on filter, sort, and pagination
+        const getitems = await Items.find(filter, { "__v": false }).sort(sortCriteria).limit(limitInt).skip(skip);
+
+        // Handle no items found
+        if (getitems.length === 0) {
             return res.status(404).json({
-                status:false,
-                message:"No items found",
-            })
+                status: false,
+                message: "No items found",
+            });
         }
 
-        const minItemPrice = getitems.reduce((min, item) => item.price < min ? item.price : min, getitems[0].price);
-        const maxItemPrice = getitems.reduce((max, item) => item.price > max ? item.price : max, 0);
+        // Get min and max price from filtered items
+        const minItemPrice = Math.min(...getitems.map(item => item.price));
+        const maxItemPrice = Math.max(...getitems.map(item => item.price));
 
-
+        // Return response
         return res.status(200).json({
-            status:true,
-            message:"fetched items succesfuly",
-            data:getitems,
-            minPrice:minItemPrice,
-            maxPrice:maxItemPrice
-            })
-      } catch (error) {
+            status: true,
+            message: "Fetched items successfully",
+            data: getitems,
+            minPrice: minItemPrice,
+            maxPrice: maxItemPrice
+        });
+        
+    } catch (error) {
+        // Error handling
         return res.status(500).json({
-            status:"error",
-            message:error.message,
-        })
+            status: "error",
+            message: error.message,
+        });
     }
-}
+};
 
 const getSaleItems=async (req,res)=>{ 
     try {
@@ -255,6 +226,7 @@ const addItem=async (req,res)=>{
                 message:"price must be greater than price after sale"
             })
         }
+         // Sale percentage calculation
         let ByPercentage=0;
         if (priceAfterSale) {
              ByPercentage =100 - (priceAfterSale*100)/price;
