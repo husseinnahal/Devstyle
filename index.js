@@ -36,7 +36,7 @@ app.use("/api/Wishlist",Wishlist);
 
 
 
-app.use('/images/Itemimg', express.static(path.join(__dirname, 'images/Itemimg')));
+app.use('/images/Itemimg', express.static(path.join(__dirname, 'images', 'Itemimg')));
 app.use('/images/SubCatImg', express.static(path.join(__dirname, 'images/SubCatImg')));
 
 

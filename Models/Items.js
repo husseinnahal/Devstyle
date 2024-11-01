@@ -57,10 +57,6 @@ const itemSchema=new mongo.Schema({
     images: {
         type:[String],
         required: [true, 'Image  is required'],
-    },
-    inWishlist:{
-        type:Boolean,
-        default:false
     }
 },{timestamps:true});
 

@@ -1,5 +1,4 @@
 const Wishlist=require('../Models/Wishlistmodel');
-const item=require('../Models/Items');
 
 
 const addtoWishlist=async(req,res)=>{
@@ -22,8 +21,6 @@ const addtoWishlist=async(req,res)=>{
       }
     }
 
-    const  itemWish = await item.findByIdAndUpdate(items,{ inWishlist:true });
- 
     await wishlist.save();
 
     return res.status(200).json({ 
@@ -37,8 +34,6 @@ const addtoWishlist=async(req,res)=>{
         message:error.message,
          });
    }
-
-
 }
 
 const delfrom_Wihslist=async(req,res)=>{
@@ -55,7 +50,6 @@ const delfrom_Wihslist=async(req,res)=>{
             })
         } else {
             wishlist.items=await wishlist.items.filter(item => item.toString() !== items);
-            const  itemWish = await item.findByIdAndUpdate(items,{ inWishlist:false });
 
             wishlist.save();
     
@@ -101,8 +95,35 @@ try {
 
 }
 
+const getid=async(req,res)=>{
+    try {
+        const getwish=await Wishlist.find({user:req.decoded.id}).populate("items",`_id`);
+        if (!getwish) {
+            return res.status(400).json({
+                status:false,
+                message:"you dont have Wishlist",
+            })
+        }
+        
+        return res.status(200).json({
+            status:true,
+            message:"feched succesfuly",
+            data:getwish
+        })
+        
+    } catch (error) {
+        return res.status(500).json({ 
+            status: false,
+            message:error.message,
+             });
+    }
+    
+    
+    }
+
 module.exports={
     addtoWishlist,
     delfrom_Wihslist,
-    getwishlist
+    getwishlist,
+    getid
 }
