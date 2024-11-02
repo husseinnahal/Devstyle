@@ -97,7 +97,7 @@ try {
 
 const getid=async(req,res)=>{
     try {
-        const getwish=await Wishlist.find({user:req.decoded.id}).populate("items",`_id`);
+        const getwish=await Wishlist.find({user:req.decoded.id}).populate("items",'_id');
         if (!getwish) {
             return res.status(400).json({
                 status:false,

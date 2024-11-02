@@ -163,9 +163,12 @@ const removeItemFromCart = async (req, res) => {
         const { productId,color,size } = req.body;
         const cart = await Cart.findOne({ user: req.decoded.id });
 
+
         cart.items = cart.items.filter(
-            (item) => !(item.item.toString() === productId && item.color === color && item.size === size)
+            (items) => !(items.item.toString() === productId && items.color === color && items.size === size)
         );
+        
+
         const totalPrice = cart.items.reduce((total, items) => {
             return total + (items.quantity * items.price);
         }, 0);
