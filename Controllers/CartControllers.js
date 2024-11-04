@@ -58,7 +58,7 @@ const addItemToCart = async (req, res) => {
 
             }
             // If it does not exist, add a new item
-            cart.items.push({ item: productId, quantity, name:product.name, price:price, color, size ,image:product.imageCover});
+            cart.items.push({ item: productId, quantity, name:product.name, price:price, color, size ,image:product.imageCover,instock:product.inStock});
         }
 
         const totalPrice = cart.items.reduce((total, items) => {
@@ -111,6 +111,13 @@ const updateCartQuantity = async (req, res) => {
     try {
         const { productId, quantity, color, size} = req.body; // Data to identify the item and the new quantity
         const userId =req.decoded.id; // Assuming req.user contains authenticated user information
+        // Validate quantity
+        if (quantity < 1) {
+            return res.status(400).json({
+                status: false,
+                message: "Quantity must be at least 1",
+            });
+        }
 
         // Find the user's cart
         let cart = await Cart.findOne({ user: userId });
@@ -130,11 +137,10 @@ const updateCartQuantity = async (req, res) => {
             // Update the quantity
             cart.items[existingItemIndex].quantity = quantity;
 
-            const totalPrice = cart.items.reduce((total, items) => {
-                return total + items.quantity * items.price;
-            }, 0);
-    
-            cart.totalCartPrice = totalPrice;
+            // Update total cart price
+            cart.totalCartPrice = cart.items.reduce((total, item) => 
+                total + item.quantity * item.price, 0
+            );
 
             await cart.save();
 
@@ -168,16 +174,12 @@ const removeItemFromCart = async (req, res) => {
             (items) => !(items.item.toString() === productId && items.color === color && items.size === size)
         );
         
-
-        const totalPrice = cart.items.reduce((total, items) => {
-            return total + (items.quantity * items.price);
-        }, 0);
-
-        cart.totalCartPrice=totalPrice;
+        cart.totalCartPrice = cart.items.reduce((total, item) => total + item.quantity * item.price, 0);
 
         await cart.save();
         
-        return res.status(200).json({ status: true,
+        return res.status(200).json({ 
+            status: true,
             message: "Item removed from cart",
         }
         );

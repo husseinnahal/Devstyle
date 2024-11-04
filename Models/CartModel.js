@@ -25,11 +25,15 @@ const cartSchema= new mongo.Schema({
             required:true
           },
           price:{
-            type:String,
+            type:Number,
             required:true
           },
           image:{
             type:String,
+            required:true
+          },
+          instock:{
+            type:Number,
             required:true
           }
         
