@@ -45,7 +45,8 @@ const itemSchema=new mongo.Schema({
     inStock:{
         type:Number,
         required:[true,"quantity is required"],
-        min:[1,"quantity must be above or equal 5"]
+        min:[0,"quantity must be above or equal 5"],
+        default:1
     },
     sold:{
         type:Number,

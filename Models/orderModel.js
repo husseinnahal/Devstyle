@@ -3,8 +3,8 @@ const mongo =require('mongoose');
 
 const cartSchema= new mongo.Schema({
 
-    cartid:{
-      type:mongo.Schema.Types.ObjectId,
+    cart:{
+      type:[String],
       ref:"CartItems",
       required:true,
     },
