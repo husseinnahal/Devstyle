@@ -8,7 +8,7 @@ const Router=express.Router();
 
 Router.get("/",Items.getItems);
 Router.get("/sales",Items.getSaleItems);
-Router.post("/searchs",Items.searchs);
+Router.get("/searchs",Items.searchs);
 Router.get("/bestSeller",Items.bestSeller);
 Router.get("/cat/:cat",Items.getItemsByCat);
 Router.get("/:id",Items.getAnItem);
