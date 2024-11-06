@@ -153,13 +153,15 @@ const getSaleItems=async (req,res)=>{
 const searchs=async (req,res)=>{ 
     try {
         let {search} = req.query
-        search = search.trim(); 
-        if (!search) {
+
+        if (!search || search.trim() === "") {
             return res.status(400).json({
                 status: false,
                 message: "Search input is empty"
             });
         }
+        search = search.trim(); 
+
         const getsearch=await Items.find( { name: { $regex: search, $options: 'i' }},{ "__v": false })
 
         if (getsearch.length==0) {
@@ -181,6 +183,7 @@ const searchs=async (req,res)=>{
         })
     }
 }
+
 const bestSeller=async (req,res)=>{ 
     try {
 
