@@ -85,13 +85,10 @@ const getItemsByCat = async (req, res) => {
         const sortCriteria = {};
         if (sortNew) sortCriteria.createdAt = parseInt(sortNew, 10);
         if (populars) sortCriteria.sold = parseInt(populars, 10);
-        console.log(sortCriteria);
         
         // Fetch items based on filter, sort, and pagination
-        const getitems = await Items.find(filter, { "__v": false }).sort(sortCriteria)
-        const TotalItems=getitems.length
-        
-        getitems=getitems.limit(limitInt).skip(skip);
+       const getitems= await Items.find(filter, { "__v": false }).sort(sortCriteria).limit(limitInt).skip(skip);
+       const totalItemsCount = await Items.countDocuments(filter);
 
         // Handle no items found
         if (getitems.length === 0) {
@@ -112,7 +109,7 @@ const getItemsByCat = async (req, res) => {
             data: getitems,
             minPrice: minItemPrice,
             maxPrice: maxItemPrice,
-            Nbitems:TotalItems
+            Nbitems:totalItemsCount
         });
         
     } catch (error) {
