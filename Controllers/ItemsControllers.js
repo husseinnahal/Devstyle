@@ -83,11 +83,15 @@ const getItemsByCat = async (req, res) => {
 
         // Build sort criteria based on query parameters
         const sortCriteria = {};
-        if (sortNew) sortCriteria.createdAt = sortNew === '1' ? 1 : -1;
-        if (populars) sortCriteria.sold = populars === '1' ? 1 : -1;
-
+        if (sortNew) sortCriteria.createdAt = parseInt(sortNew, 10);
+        if (populars) sortCriteria.sold = parseInt(populars, 10);
+        console.log(sortCriteria);
+        
         // Fetch items based on filter, sort, and pagination
-        const getitems = await Items.find(filter, { "__v": false }).sort(sortCriteria).limit(limitInt).skip(skip);
+        const getitems = await Items.find(filter, { "__v": false }).sort(sortCriteria)
+        const TotalItems=getitems.length
+        
+        getitems=getitems.limit(limitInt).skip(skip);
 
         // Handle no items found
         if (getitems.length === 0) {
@@ -107,7 +111,8 @@ const getItemsByCat = async (req, res) => {
             message: "Fetched items successfully",
             data: getitems,
             minPrice: minItemPrice,
-            maxPrice: maxItemPrice
+            maxPrice: maxItemPrice,
+            Nbitems:TotalItems
         });
         
     } catch (error) {
